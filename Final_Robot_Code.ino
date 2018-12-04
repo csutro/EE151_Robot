@@ -7,10 +7,16 @@
  * based on the threshold setting and returns binary value of 
  * IR sensor status
  */
+
+#define region(...)
+
+region("Variables",{)
+ 
 #include <Servo.h>
 #include <math.h>
 
 Servo myservo; //servo object
+Servo eggServo;
 #define IR1 11 //left sensor
 #define IR2 12 //left-mid sensor
 #define IR3 13 //middle sensor
@@ -36,6 +42,7 @@ int inputSpeed;
 String inputDirection; 
 int inputTurnRatio;   
 
+const int eggServoPin = 9;
 const int servoPin = 11;
 byte sensorCode = 0; //byte binary representation of sensor status
 byte previousSensorReads;
@@ -50,6 +57,11 @@ int previousError;
 int leftMotorSpeed;
 int rightMotorSpeed;
 int speedAdjustmentControl;
+
+bool cupSearching = false;
+const int cupDropDist=2;
+
+region("Variables",})
 
 int readLineSensor(int sensorAnalogInPin, int sensorDigitalOutPin){ //outputs 1 if analogRead() value of sensor is greater than threshold, 0 if less than.
   sensorA = analogRead(sensorAnalogInPin);
@@ -110,6 +122,9 @@ float sensePathPositionError(byte PathSensorStates){
   }
   else if(bitRead(PathSensorStates, 0) == 0 && bitRead(PathSensorStates, 1) == 0 && bitRead(PathSensorStates, 2) == 0 && bitRead(PathSensorStates, 3) == 0 && bitRead(PathSensorStates, 4) == 1){
     return 2;
+  }
+  else if(bitRead(PathSensorStates, 0) == 1 && bitRead(PathSensorStates, 1) == 1 && bitRead(PathSensorStates, 2) == 1 && bitRead(PathSensorStates, 3) == 1 && bitRead(PathSensorStates, 4) == 0){
+    return 3;
   }
   else{
     return 100; //bogus value  
@@ -188,18 +203,38 @@ void stopMotors(){ //sets all motor gates to 0 to stop all motors
 } 
 
 void followLine(int followSpeed, float pathErrorIn, int gain){
-    if(pathError > 2 || pathError < -2){
+    if(pathError == 3){
+      cupSearching = true;
+      return;
+    }
+    else if(pathError > 2 || pathError < -2){
       return;
     }
     else{
+      
     stopMotors();
+    
+    if(cupSearching == true /* && sensorDist == cupDropDist distance sensor val is lower than x dist from cup*/){
+      Serial.print("Dropping Egg...");
+      robotMove("R",50,-1);
+      delay(600);
+      stopMotors();
+      eggServo.write(720);
+      delay(1000);
+      eggServo.write(-720);
+      cupSearching = false;
+    }
     speedAdjustmentControl = gain * pathErrorIn;
+    
     rightMotorSpeed = (100. - speedAdjustmentControl)*followSpeed / 100.;
     rightMotorSpeed = constrain(rightMotorSpeed, 0, followSpeed);
+    
     leftMotorSpeed = (100. + speedAdjustmentControl)*followSpeed / 100.;
     leftMotorSpeed = constrain(leftMotorSpeed, 0, followSpeed);
+    
     motorMove(rightMotor, rightMotorSpeed);
     motorMove(leftMotor, leftMotorSpeed);
+    
     Serial.print("Path Error of "); Serial.print(pathErrorIn); Serial.print(" yields speeds of {");
     Serial.print("Left Motor: "); Serial.print(leftMotorSpeed); Serial.print("  ");
     Serial.print("Right Motor: "); Serial.print(rightMotorSpeed); Serial.println("}");
@@ -233,14 +268,18 @@ void debugLineState(){
   previousState = currentState;
 }
 
-
 void setup() {
   Serial.begin(9600);
   Serial.println("Serial connection established"); 
+  
   myservo.attach(servoPin);
   myservo.write(180);
   delay(800);
   myservo.write(90);
+  delay(800);
+
+  eggServo.attach(eggServoPin);
+  eggServo.write(180);
   delay(800);
 
  pinMode(motorA1, OUTPUT); //Set digital pins as OUTPUTs 
