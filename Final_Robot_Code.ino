@@ -21,7 +21,7 @@ Servo eggServo;
 #define IR2 12 //left-mid sensor
 #define IR3 13 //middle sensor
 #define IR4 14 //right-mid sensor
-#define IR5 15 //right sensor
+#define IR5 8 //right sensor
 
 #define pointingGain 20
 
@@ -66,7 +66,7 @@ region("Variables",})
 int readLineSensor(int sensorAnalogInPin, int sensorDigitalOutPin){ //outputs 1 if analogRead() value of sensor is greater than threshold, 0 if less than.
   sensorA = analogRead(sensorAnalogInPin);
   if(sensorAnalogInPin == IR5){
-    sensorA -= 10;
+    sensorA = 0;
   }
   //Serial.println(sensorA);
 
