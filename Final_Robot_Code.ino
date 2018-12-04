@@ -100,25 +100,25 @@ float sensePathPositionError(byte PathSensorStates){
     return -2;
   }
   else if(bitRead(PathSensorStates, 0) == 1 && bitRead(PathSensorStates, 1) == 1 && bitRead(PathSensorStates, 2) == 0 && bitRead(PathSensorStates, 3) == 0 && bitRead(PathSensorStates, 4) == 0){
-    return -1.5;
+    return -1.75;
   }
   else if(bitRead(PathSensorStates, 0) == 0 && bitRead(PathSensorStates, 1) == 1 && bitRead(PathSensorStates, 2) == 0 && bitRead(PathSensorStates, 3) == 0 && bitRead(PathSensorStates, 4) == 0){
-    return -1;
+    return -1.5;
   }
   else if(bitRead(PathSensorStates, 0) == 0 && bitRead(PathSensorStates, 1) == 1 && bitRead(PathSensorStates, 2) == 1 && bitRead(PathSensorStates, 3) == 0 && bitRead(PathSensorStates, 4) == 0){
-    return -0.5;
+    return -0.75;
   }
   else if(bitRead(PathSensorStates, 0) == 0 && bitRead(PathSensorStates, 1) == 0 && bitRead(PathSensorStates, 2) == 1 && bitRead(PathSensorStates, 3) == 0 && bitRead(PathSensorStates, 4) == 0){
     return 0;
   }
   else if(bitRead(PathSensorStates, 0) == 0 && bitRead(PathSensorStates, 1) == 0 && bitRead(PathSensorStates, 2) == 1 && bitRead(PathSensorStates, 3) == 1 && bitRead(PathSensorStates, 4) == 0){
-    return 0.5;
+    return 0.75;
   }
   else if(bitRead(PathSensorStates, 0) == 0 && bitRead(PathSensorStates, 1) == 0 && bitRead(PathSensorStates, 2) == 0 && bitRead(PathSensorStates, 3) == 1 && bitRead(PathSensorStates, 4) == 0){
-    return 1;
+    return 1.5;
   }
   else if(bitRead(PathSensorStates, 0) == 0 && bitRead(PathSensorStates, 1) == 0 && bitRead(PathSensorStates, 2) == 0 && bitRead(PathSensorStates, 3) == 1 && bitRead(PathSensorStates, 4) == 1){
-    return 1.5;
+    return 1.75;
   }
   else if(bitRead(PathSensorStates, 0) == 0 && bitRead(PathSensorStates, 1) == 0 && bitRead(PathSensorStates, 2) == 0 && bitRead(PathSensorStates, 3) == 0 && bitRead(PathSensorStates, 4) == 1){
     return 2;
@@ -294,5 +294,5 @@ void loop() {
   getPathSensorStates();
   debugLineState();
   myservo.write(updatePointingAngle(pathError));
-  followLine(40, pathError, 15);
+  followLine(50, pathError, 40);
 }
