@@ -1,7 +1,7 @@
 /* Week 9 Pre-lab
  * IR Sensor
  * 
- * Gary Huarng
+ * Charlie Sutro
  * 
  * Detects if IR sensor is seeing "black" as opposed to "white"
  * based on the threshold setting and returns binary value of 
